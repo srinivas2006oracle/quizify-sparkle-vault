@@ -16,9 +16,9 @@ const CreateQuiz = () => {
     setQuiz(createEmptyQuiz());
   }, []);
 
-  const handleSave = (newQuiz: Quiz) => {
+  const handleSave = async (newQuiz: Quiz) => {
     try {
-      createQuiz(newQuiz);
+      await createQuiz(newQuiz);
       toast({
         title: "Quiz created",
         description: "The quiz has been successfully created.",

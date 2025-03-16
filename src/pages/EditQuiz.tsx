@@ -15,27 +15,41 @@ const EditQuiz = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (id) {
-      const quizData = getQuiz(id);
-      if (quizData) {
-        setQuiz(quizData);
+    const fetchQuiz = async () => {
+      if (id) {
+        try {
+          const quizData = await getQuiz(id);
+          if (quizData) {
+            setQuiz(quizData);
+          } else {
+            toast({
+              title: "Quiz not found",
+              description: "The requested quiz could not be found.",
+              variant: "destructive",
+            });
+            navigate("/");
+          }
+        } catch (error) {
+          console.error("Error fetching quiz:", error);
+          toast({
+            title: "Error",
+            description: "Failed to load quiz. Please try again.",
+            variant: "destructive",
+          });
+          navigate("/");
+        }
       } else {
-        toast({
-          title: "Quiz not found",
-          description: "The requested quiz could not be found.",
-          variant: "destructive",
-        });
-        navigate("/");
+        setQuiz(createEmptyQuiz());
       }
-    } else {
-      setQuiz(createEmptyQuiz());
-    }
-    setIsLoading(false);
+      setIsLoading(false);
+    };
+
+    fetchQuiz();
   }, [id, navigate, toast]);
 
-  const handleSave = (updatedQuiz: Quiz) => {
+  const handleSave = async (updatedQuiz: Quiz) => {
     try {
-      updateQuiz(updatedQuiz);
+      await updateQuiz(updatedQuiz);
       toast({
         title: "Quiz updated",
         description: "The quiz has been successfully updated.",

@@ -1,6 +1,6 @@
 
 import { Quiz, Question } from "@/types/quiz";
-import { sampleQuizzes } from "@/data/sampleQuizzes";
+import { apiService } from "@/services/apiService";
 
 // Function to generate a unique ID
 export const generateId = (): string => {
@@ -61,75 +61,62 @@ export const createEmptyQuiz = (): Quiz => {
   };
 };
 
-// In a real application, these would connect to an API
-// For now, we'll use local storage to persist changes
-
-// Load quizzes from storage or use sample data
-export const loadQuizzes = (): Quiz[] => {
+// Load quizzes from API
+export const loadQuizzes = async (): Promise<Quiz[]> => {
   try {
-    const storedQuizzes = localStorage.getItem('quizzes');
-    if (storedQuizzes) {
-      return JSON.parse(storedQuizzes);
-    }
-    // Initialize with sample data if nothing is stored
-    localStorage.setItem('quizzes', JSON.stringify(sampleQuizzes));
-    return sampleQuizzes;
+    return await apiService.getQuizzes();
   } catch (error) {
     console.error('Error loading quizzes:', error);
-    return sampleQuizzes;
-  }
-};
-
-// Save quizzes to storage
-export const saveQuizzes = (quizzes: Quiz[]): void => {
-  try {
-    localStorage.setItem('quizzes', JSON.stringify(quizzes));
-  } catch (error) {
-    console.error('Error saving quizzes:', error);
+    return [];
   }
 };
 
 // Get a specific quiz by ID
-export const getQuiz = (id: string): Quiz | undefined => {
-  const quizzes = loadQuizzes();
-  return quizzes.find(quiz => quiz.id === id);
+export const getQuiz = async (id: string): Promise<Quiz | undefined> => {
+  try {
+    return await apiService.getQuiz(id);
+  } catch (error) {
+    console.error(`Error getting quiz ${id}:`, error);
+    return undefined;
+  }
 };
 
 // Create a new quiz
-export const createQuiz = (quiz: Quiz): Quiz => {
-  const quizzes = loadQuizzes();
-  const newQuiz = { ...quiz, id: generateId() };
-  saveQuizzes([...quizzes, newQuiz]);
-  return newQuiz;
+export const createQuiz = async (quiz: Quiz): Promise<Quiz> => {
+  try {
+    return await apiService.createQuiz(quiz);
+  } catch (error) {
+    console.error('Error creating quiz:', error);
+    throw error;
+  }
 };
 
 // Update an existing quiz
-export const updateQuiz = (updatedQuiz: Quiz): Quiz => {
-  const quizzes = loadQuizzes();
-  const updatedQuizzes = quizzes.map(quiz => 
-    quiz.id === updatedQuiz.id ? updatedQuiz : quiz
-  );
-  saveQuizzes(updatedQuizzes);
-  return updatedQuiz;
+export const updateQuiz = async (updatedQuiz: Quiz): Promise<Quiz> => {
+  try {
+    return await apiService.updateQuiz(updatedQuiz);
+  } catch (error) {
+    console.error(`Error updating quiz ${updatedQuiz.id}:`, error);
+    throw error;
+  }
 };
 
 // Delete a quiz
-export const deleteQuiz = (id: string): void => {
-  const quizzes = loadQuizzes();
-  const filteredQuizzes = quizzes.filter(quiz => quiz.id !== id);
-  saveQuizzes(filteredQuizzes);
+export const deleteQuiz = async (id: string): Promise<void> => {
+  try {
+    await apiService.deleteQuiz(id);
+  } catch (error) {
+    console.error(`Error deleting quiz ${id}:`, error);
+    throw error;
+  }
 };
 
 // Search quizzes by term (title, description, topics)
-export const searchQuizzes = (searchTerm: string): Quiz[] => {
-  const quizzes = loadQuizzes();
-  if (!searchTerm.trim()) return quizzes;
-  
-  const lowerCaseSearchTerm = searchTerm.toLowerCase();
-  
-  return quizzes.filter(quiz => 
-    quiz.quizTitle.toLowerCase().includes(lowerCaseSearchTerm) ||
-    quiz.quizDescription.toLowerCase().includes(lowerCaseSearchTerm) ||
-    quiz.quizTopicsList.some(topic => topic.toLowerCase().includes(lowerCaseSearchTerm))
-  );
+export const searchQuizzes = async (searchTerm: string): Promise<Quiz[]> => {
+  try {
+    return await apiService.searchQuizzes(searchTerm);
+  } catch (error) {
+    console.error('Error searching quizzes:', error);
+    return [];
+  }
 };

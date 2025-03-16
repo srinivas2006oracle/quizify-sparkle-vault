@@ -17,7 +17,7 @@ const Index = () => {
     const fetchQuizzes = async () => {
       setIsLoading(true);
       try {
-        const data = loadQuizzes();
+        const data = await loadQuizzes();
         setQuizzes(data);
         setSearchResults(data);
       } catch (error) {
@@ -35,14 +35,26 @@ const Index = () => {
     fetchQuizzes();
   }, [toast]);
 
-  const handleSearch = (searchTerm: string) => {
-    const results = searchQuizzes(searchTerm);
-    setSearchResults(results);
+  const handleSearch = async (searchTerm: string) => {
+    try {
+      setIsLoading(true);
+      const results = await searchQuizzes(searchTerm);
+      setSearchResults(results);
+    } catch (error) {
+      console.error("Error searching quizzes:", error);
+      toast({
+        title: "Error",
+        description: "Failed to search quizzes. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     try {
-      deleteQuiz(id);
+      await deleteQuiz(id);
       setQuizzes(prevQuizzes => prevQuizzes.filter(quiz => quiz.id !== id));
       setSearchResults(prevResults => prevResults.filter(quiz => quiz.id !== id));
       toast({

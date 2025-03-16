@@ -19,20 +19,34 @@ const ViewQuiz = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (id) {
-      const quizData = getQuiz(id);
-      if (quizData) {
-        setQuiz(quizData);
-      } else {
-        toast({
-          title: "Quiz not found",
-          description: "The requested quiz could not be found.",
-          variant: "destructive",
-        });
-        navigate("/");
+    const fetchQuiz = async () => {
+      if (id) {
+        try {
+          const quizData = await getQuiz(id);
+          if (quizData) {
+            setQuiz(quizData);
+          } else {
+            toast({
+              title: "Quiz not found",
+              description: "The requested quiz could not be found.",
+              variant: "destructive",
+            });
+            navigate("/");
+          }
+        } catch (error) {
+          console.error("Error fetching quiz:", error);
+          toast({
+            title: "Error",
+            description: "Failed to load quiz. Please try again.",
+            variant: "destructive",
+          });
+          navigate("/");
+        }
       }
-    }
-    setIsLoading(false);
+      setIsLoading(false);
+    };
+
+    fetchQuiz();
   }, [id, navigate, toast]);
 
   const handleEdit = () => {
