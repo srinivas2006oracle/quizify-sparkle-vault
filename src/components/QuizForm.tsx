@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { PlusCircle, Trash2, Save, X, ArrowLeft, Check } from "lucide-react";
@@ -23,11 +22,11 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialQuiz, onSave, isEditing }) =
   const [quiz, setQuiz] = useState<Quiz>(initialQuiz);
   const [activeTab, setActiveTab] = useState("details");
   const [newTopic, setNewTopic] = useState("");
+  const [newQuestionTopic, setNewQuestionTopic] = useState("");
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Reset form if initialQuiz changes
   useEffect(() => {
     setQuiz(initialQuiz);
   }, [initialQuiz]);
@@ -116,7 +115,6 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialQuiz, onSave, isEditing }) =
         updatedAt: new Date().toISOString(),
       };
 
-      // If changing correctChoiceIndex, also update correctAnswer
       if (field === "correctChoiceIndex") {
         const choiceIndex = value as number;
         if (choiceIndex >= 0 && choiceIndex < newQuestions[index].choices.length) {
@@ -138,7 +136,6 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialQuiz, onSave, isEditing }) =
       const newChoices = [...newQuestions[questionIndex].choices];
       newChoices[choiceIndex] = value;
 
-      // If updating the correct choice, also update correctAnswer
       if (choiceIndex === newQuestions[questionIndex].correctChoiceIndex) {
         newQuestions[questionIndex].correctAnswer = value;
       }
@@ -189,13 +186,11 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialQuiz, onSave, isEditing }) =
       const newChoices = [...newQuestions[questionIndex].choices];
       newChoices.splice(choiceIndex, 1);
 
-      // If removing the correct choice, reset correctChoiceIndex to 0
       let newCorrectChoiceIndex = newQuestions[questionIndex].correctChoiceIndex;
       if (choiceIndex === newCorrectChoiceIndex) {
         newCorrectChoiceIndex = 0;
         newQuestions[questionIndex].correctAnswer = newChoices[0];
       } else if (choiceIndex < newCorrectChoiceIndex) {
-        // If removing a choice before the correct choice, decrement the index
         newCorrectChoiceIndex--;
       }
 
@@ -214,8 +209,49 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialQuiz, onSave, isEditing }) =
     });
   };
 
+  const handleAddQuestionTopic = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && newQuestionTopic.trim()) {
+      e.preventDefault();
+      const currentTopics = quiz.questions[activeQuestionIndex].questionTopicsList || [];
+      
+      if (!currentTopics.includes(newQuestionTopic.trim())) {
+        setQuiz((prev) => {
+          const newQuestions = [...prev.questions];
+          newQuestions[activeQuestionIndex] = {
+            ...newQuestions[activeQuestionIndex],
+            questionTopicsList: [...currentTopics, newQuestionTopic.trim()],
+            updatedAt: new Date().toISOString(),
+          };
+          return {
+            ...prev,
+            questions: newQuestions,
+            updatedAt: new Date().toISOString(),
+          };
+        });
+      }
+      setNewQuestionTopic("");
+    }
+  };
+
+  const handleRemoveQuestionTopic = (topicToRemove: string) => {
+    setQuiz((prev) => {
+      const newQuestions = [...prev.questions];
+      newQuestions[activeQuestionIndex] = {
+        ...newQuestions[activeQuestionIndex],
+        questionTopicsList: newQuestions[activeQuestionIndex].questionTopicsList.filter(
+          topic => topic !== topicToRemove
+        ),
+        updatedAt: new Date().toISOString(),
+      };
+      return {
+        ...prev,
+        questions: newQuestions,
+        updatedAt: new Date().toISOString(),
+      };
+    });
+  };
+
   const handleSave = () => {
-    // Validation
     if (!quiz.quizTitle.trim()) {
       toast({
         title: "Missing information",
@@ -226,7 +262,6 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialQuiz, onSave, isEditing }) =
       return;
     }
 
-    // Check if all questions have text
     const invalidQuestionIndex = quiz.questions.findIndex(q => !q.questionText.trim());
     if (invalidQuestionIndex !== -1) {
       toast({
@@ -239,7 +274,6 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialQuiz, onSave, isEditing }) =
       return;
     }
 
-    // Check if all questions have valid choices
     for (let i = 0; i < quiz.questions.length; i++) {
       const question = quiz.questions[i];
       const emptyChoiceIndex = question.choices.findIndex(c => !c.trim());
@@ -534,6 +568,34 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialQuiz, onSave, isEditing }) =
                         placeholder="Explain why the answer is correct"
                         className="w-full min-h-[80px]"
                       />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Question Topics</Label>
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        {quiz.questions[activeQuestionIndex].questionTopicsList.map((topic, index) => (
+                          <Badge key={index} variant="secondary" className="gap-1 px-3 py-1.5">
+                            {topic}
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveQuestionTopic(topic)}
+                              className="ml-1 text-muted-foreground hover:text-foreground"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </Badge>
+                        ))}
+                      </div>
+                      <Input
+                        value={newQuestionTopic}
+                        onChange={(e) => setNewQuestionTopic(e.target.value)}
+                        onKeyDown={handleAddQuestionTopic}
+                        placeholder="Type a topic and press Enter"
+                        className="w-full"
+                      />
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Press Enter to add a topic to this question
+                      </p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

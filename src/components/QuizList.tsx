@@ -69,6 +69,7 @@ const QuizList: React.FC<QuizListProps> = ({ quizzes, onDelete }) => {
                 <th className="px-6 py-4 font-medium text-muted-foreground hidden lg:table-cell">Topics</th>
                 <th className="px-6 py-4 font-medium text-muted-foreground hidden lg:table-cell">Questions</th>
                 <th className="px-6 py-4 font-medium text-muted-foreground hidden md:table-cell">Updated</th>
+                <th className="px-6 py-4 font-medium text-muted-foreground hidden sm:table-cell">Status</th>
                 <th className="px-6 py-4 font-medium text-muted-foreground text-right">Actions</th>
               </tr>
             </thead>
@@ -112,6 +113,15 @@ const QuizList: React.FC<QuizListProps> = ({ quizzes, onDelete }) => {
                       <Calendar className="w-3 h-3 mr-1" />
                       {formatDate(quiz.updatedAt)}
                     </div>
+                  </td>
+                  <td className="px-6 py-4 hidden sm:table-cell">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      quiz.readyForLive 
+                        ? "bg-green-100 text-green-800" 
+                        : "bg-amber-100 text-amber-800"
+                    }`}>
+                      {quiz.readyForLive ? "Ready for Live" : "Draft"}
+                    </span>
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end space-x-2">
