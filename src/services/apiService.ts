@@ -3,9 +3,14 @@ import { Quiz } from "@/types/quiz";
 
 const API_BASE_URL = "https://api.example.com"; // Replace with your actual API URL
 
+// Cache for search results to reduce API calls
+const searchCache = new Map<string, { data: Quiz[], timestamp: number }>();
+const CACHE_TTL = 60000; // 1 minute cache TTL
+
 export const apiService = {
   async getQuizzes(): Promise<Quiz[]> {
     try {
+      console.log("Fetching all quizzes");
       const response = await fetch(`${API_BASE_URL}/quizzes`);
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
@@ -18,12 +23,36 @@ export const apiService = {
   },
 
   async searchQuizzes(searchTerm: string): Promise<Quiz[]> {
+    // If empty search term, return empty results
+    if (!searchTerm.trim()) {
+      return [];
+    }
+    
+    // Check cache first
+    const cacheKey = searchTerm.trim().toLowerCase();
+    const cachedResult = searchCache.get(cacheKey);
+    
+    if (cachedResult && Date.now() - cachedResult.timestamp < CACHE_TTL) {
+      console.log("Using cached search results for:", searchTerm);
+      return cachedResult.data;
+    }
+    
     try {
+      console.log("Searching quizzes for term:", searchTerm);
       const response = await fetch(`${API_BASE_URL}/quizzes/search?term=${encodeURIComponent(searchTerm)}`);
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
-      return await response.json();
+      
+      const data = await response.json();
+      
+      // Cache the result
+      searchCache.set(cacheKey, {
+        data,
+        timestamp: Date.now()
+      });
+      
+      return data;
     } catch (error) {
       console.error("Error searching quizzes:", error);
       throw error;

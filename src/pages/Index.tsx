@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import QuizSearch from "@/components/QuizSearch";
 import QuizList from "@/components/QuizList";
 import Header from "@/components/Header";
@@ -11,8 +11,10 @@ const Index = () => {
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [searchResults, setSearchResults] = useState<Quiz[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSearching, setIsSearching] = useState(false);
   const { toast } = useToast();
 
+  // Load quizzes on initial mount
   useEffect(() => {
     const fetchQuizzes = async () => {
       setIsLoading(true);
@@ -35,9 +37,16 @@ const Index = () => {
     fetchQuizzes();
   }, [toast]);
 
-  const handleSearch = async (searchTerm: string) => {
+  // Debounced search handler
+  const handleSearch = useCallback(async (searchTerm: string) => {
+    // If empty search term, reset to showing all quizzes
+    if (!searchTerm.trim()) {
+      setSearchResults(quizzes);
+      return;
+    }
+    
     try {
-      setIsLoading(true);
+      setIsSearching(true);
       const results = await searchQuizzes(searchTerm);
       setSearchResults(results);
     } catch (error) {
@@ -48,9 +57,9 @@ const Index = () => {
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setIsSearching(false);
     }
-  };
+  }, [quizzes, toast]);
 
   const handleDelete = async (id: string) => {
     try {
@@ -85,7 +94,7 @@ const Index = () => {
 
           <QuizSearch onSearch={handleSearch} />
 
-          {isLoading ? (
+          {isLoading || isSearching ? (
             <div className="w-full bg-white/80 backdrop-blur-md rounded-xl shadow-sm border border-border p-8 text-center animate-pulse-subtle">
               <div className="flex flex-col items-center justify-center space-y-4 py-12">
                 <div className="w-16 h-16 rounded-full bg-muted animate-pulse"></div>

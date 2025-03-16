@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Search, PlusCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -12,15 +12,31 @@ const QuizSearch = ({ onSearch }: QuizSearchProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      onSearch(searchTerm);
-    }, 300);
+  // Create a memoized debounced search function
+  const debouncedSearch = useCallback((term: string) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    
+    timeoutRef.current = setTimeout(() => {
+      onSearch(term);
+    }, 500); // Increased debounce time to 500ms
+  }, [onSearch]);
 
-    return () => clearTimeout(timer);
-  }, [searchTerm, onSearch]);
+  // Only search when the searchTerm changes
+  useEffect(() => {
+    debouncedSearch(searchTerm);
+    
+    // Clean up timeout on unmount
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [searchTerm, debouncedSearch]);
 
   const handleCreateNew = () => {
     navigate("/create");
