@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { PlusCircle, Trash2, Save, X, ArrowLeft, Check } from "lucide-react";
@@ -304,13 +305,14 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialQuiz, onSave, isEditing }) =
   return (
     <div className="w-full max-w-5xl mx-auto bg-white/90 backdrop-blur-md rounded-xl shadow-sm border border-border p-6 animate-fade-in">
       <div className="mb-6 flex items-center justify-between">
-        <button 
+        <Button 
+          variant="ghost" 
           onClick={handleCancel}
-          className="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors"
+          className="text-muted-foreground hover:text-foreground transition-colors p-0"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Quizzes
-        </button>
+        </Button>
         <div className="flex items-center gap-2">
           <Button 
             variant="outline" 
@@ -462,30 +464,31 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialQuiz, onSave, isEditing }) =
                   <h4 className="font-medium mb-3">Question List</h4>
                   <div className="space-y-1 max-h-[400px] overflow-y-auto pr-2">
                     {quiz.questions.map((question, index) => (
-                      <button
+                      <div
                         key={question.id}
                         className={`w-full text-left px-3 py-2 rounded-md transition-colors ${
                           activeQuestionIndex === index
                             ? "bg-primary/20 text-primary font-medium"
                             : "hover:bg-muted"
                         }`}
-                        onClick={() => setActiveQuestionIndex(index)}
                       >
                         <div className="flex items-center justify-between">
-                          <span className="truncate max-w-[180px]">
+                          <span 
+                            className="truncate max-w-[180px] cursor-pointer"
+                            onClick={() => setActiveQuestionIndex(index)}
+                          >
                             {question.questionText || `Question ${index + 1}`}
                           </span>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleRemoveQuestion(index);
-                            }}
-                            className="text-muted-foreground hover:text-destructive"
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleRemoveQuestion(index)}
+                            className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
                           >
                             <Trash2 className="w-4 h-4" />
-                          </button>
+                          </Button>
                         </div>
-                      </button>
+                      </div>
                     ))}
                   </div>
                 </div>
