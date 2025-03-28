@@ -26,21 +26,8 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET a single quiz by ID
-router.get('/:id', async (req, res) => {
-  try {
-    const quiz = await Quiz.findById(req.params.id);
-    if (!quiz) {
-      return res.status(404).json({ message: 'Quiz not found' });
-    }
-    res.json(addIdField(quiz));
-  } catch (error) {
-    console.error(`Error fetching quiz ${req.params.id}:`, error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// Search quizzes by title, description, or topics
+// SEARCH quizzes by title, description, or topics
+// Important: This route must be defined BEFORE the /:id route to avoid conflicts
 router.get('/search', async (req, res) => {
   try {
     const { term } = req.query;
@@ -60,6 +47,20 @@ router.get('/search', async (req, res) => {
     res.json(quizzesWithId);
   } catch (error) {
     console.error('Error searching quizzes:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// GET a single quiz by ID
+router.get('/:id', async (req, res) => {
+  try {
+    const quiz = await Quiz.findById(req.params.id);
+    if (!quiz) {
+      return res.status(404).json({ message: 'Quiz not found' });
+    }
+    res.json(addIdField(quiz));
+  } catch (error) {
+    console.error(`Error fetching quiz ${req.params.id}:`, error);
     res.status(500).json({ message: 'Server error' });
   }
 });

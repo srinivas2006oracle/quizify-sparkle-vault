@@ -16,7 +16,7 @@ const Index = () => {
 
   // Helper function to get the correct ID from a quiz
   const getQuizId = (quiz: Quiz): string => {
-    return quiz.id || quiz._id || "";
+    return quiz.id || quiz._id?.toString() || "";
   };
 
   // Load quizzes on initial mount
@@ -54,6 +54,7 @@ const Index = () => {
     try {
       setIsSearching(true);
       const results = await searchQuizzes(searchTerm);
+      console.log("Search results:", results);
       setSearchResults(results);
     } catch (error) {
       console.error("Error searching quizzes:", error);
@@ -62,6 +63,8 @@ const Index = () => {
         description: "Failed to search quizzes. Please try again.",
         variant: "destructive",
       });
+      // Fall back to showing all quizzes
+      setSearchResults(quizzes);
     } finally {
       setIsSearching(false);
     }

@@ -10,7 +10,7 @@ const CACHE_TTL = 60000; // 1 minute cache TTL
 // Helper function to normalize quiz data (convert _id to id if needed)
 const normalizeQuiz = (quiz: any): Quiz => {
   if (quiz._id && !quiz.id) {
-    return { ...quiz, id: quiz._id };
+    return { ...quiz, id: quiz._id.toString() };
   }
   return quiz;
 };
@@ -49,6 +49,7 @@ export const apiService = {
     
     try {
       console.log("Searching quizzes for term:", searchTerm);
+      // Note: Using the correct search endpoint pattern
       const response = await fetch(`${API_BASE_URL}/quizzes/search?term=${encodeURIComponent(searchTerm)}`);
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);

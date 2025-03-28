@@ -19,16 +19,34 @@ const QuizList: React.FC<QuizListProps> = ({ quizzes, onDelete }) => {
 
   // Helper function to get the correct ID from a quiz
   const getQuizId = (quiz: Quiz): string => {
-    return quiz.id || quiz._id || "";
+    return quiz.id || quiz._id?.toString() || "";
   };
 
   const handleEdit = (quiz: Quiz) => {
     const id = getQuizId(quiz);
+    if (!id) {
+      toast({
+        title: "Error",
+        description: "Cannot edit quiz: missing ID",
+        variant: "destructive",
+      });
+      return;
+    }
+    console.log("Navigating to edit quiz with ID:", id);
     navigate(`/edit/${id}`);
   };
 
   const handleView = (quiz: Quiz) => {
     const id = getQuizId(quiz);
+    if (!id) {
+      toast({
+        title: "Error",
+        description: "Cannot view quiz: missing ID",
+        variant: "destructive",
+      });
+      return;
+    }
+    console.log("Navigating to view quiz with ID:", id);
     navigate(`/view/${id}`);
   };
 
@@ -39,11 +57,6 @@ const QuizList: React.FC<QuizListProps> = ({ quizzes, onDelete }) => {
   const handleDeleteConfirmed = () => {
     if (deletingId) {
       onDelete(deletingId);
-      toast({
-        title: "Quiz deleted successfully",
-        description: "The quiz has been permanently removed.",
-        variant: "default"
-      });
       setDeletingId(null);
     }
   };
@@ -153,6 +166,7 @@ const QuizList: React.FC<QuizListProps> = ({ quizzes, onDelete }) => {
                             <button
                               className="button-icon text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                               aria-label="Delete quiz"
+                              onClick={() => confirmDelete(quizId)}
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -167,7 +181,7 @@ const QuizList: React.FC<QuizListProps> = ({ quizzes, onDelete }) => {
                             <AlertDialogFooter>
                               <AlertDialogCancel className="border border-border/50">Cancel</AlertDialogCancel>
                               <AlertDialogAction 
-                                onClick={() => onDelete(quizId)}
+                                onClick={handleDeleteConfirmed}
                                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                               >
                                 Delete

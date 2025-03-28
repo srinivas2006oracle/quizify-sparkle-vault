@@ -51,7 +51,8 @@ export const createEmptyQuestion = (): Question => {
     createdAt: now,
     updatedAt: now,
     createdBy: "current-user",
-    updatedBy: "current-user"
+    updatedBy: "current-user",
+    correctChoiceIndex: -1 // Default value when no choice is selected yet
   };
 };
 
@@ -75,6 +76,11 @@ export const createEmptyQuiz = (): Quiz => {
   };
 };
 
+// Helper function to get the correct ID from a quiz
+export const getQuizId = (quiz: Quiz): string => {
+  return quiz.id || quiz._id?.toString() || "";
+};
+
 // Load quizzes from API
 export const loadQuizzes = async (): Promise<Quiz[]> => {
   try {
@@ -87,6 +93,8 @@ export const loadQuizzes = async (): Promise<Quiz[]> => {
 
 // Get a specific quiz by ID
 export const getQuiz = async (id: string): Promise<Quiz | undefined> => {
+  if (!id) return undefined;
+  
   try {
     return await apiService.getQuiz(id);
   } catch (error) {
@@ -107,16 +115,25 @@ export const createQuiz = async (quiz: Quiz): Promise<Quiz> => {
 
 // Update an existing quiz
 export const updateQuiz = async (updatedQuiz: Quiz): Promise<Quiz> => {
+  const id = getQuizId(updatedQuiz);
+  if (!id) {
+    throw new Error('Quiz ID is missing for update operation');
+  }
+  
   try {
     return await apiService.updateQuiz(updatedQuiz);
   } catch (error) {
-    console.error(`Error updating quiz ${updatedQuiz.id}:`, error);
+    console.error(`Error updating quiz ${id}:`, error);
     throw error;
   }
 };
 
 // Delete a quiz
 export const deleteQuiz = async (id: string): Promise<void> => {
+  if (!id) {
+    throw new Error('Quiz ID is missing for delete operation');
+  }
+  
   try {
     await apiService.deleteQuiz(id);
   } catch (error) {
@@ -127,10 +144,13 @@ export const deleteQuiz = async (id: string): Promise<void> => {
 
 // Search quizzes by term (title, description, topics)
 export const searchQuizzes = async (searchTerm: string): Promise<Quiz[]> => {
+  if (!searchTerm.trim()) return [];
+  
   try {
+    console.log("Searching quizzes for term:", searchTerm);
     return await apiService.searchQuizzes(searchTerm);
   } catch (error) {
     console.error('Error searching quizzes:', error);
-    return [];
+    throw error;
   }
 };
