@@ -3,11 +3,23 @@ const express = require('express');
 const router = express.Router();
 const { Quiz } = require('../models/quizModels');
 
+// Helper to add id field for frontend compatibility
+const addIdField = (doc) => {
+  if (doc && doc._id) {
+    const result = doc.toObject ? doc.toObject() : { ...doc };
+    result.id = result._id.toString();
+    return result;
+  }
+  return doc;
+};
+
 // GET all quizzes
 router.get('/', async (req, res) => {
   try {
     const quizzes = await Quiz.find();
-    res.json(quizzes);
+    // Add id field for frontend compatibility
+    const quizzesWithId = quizzes.map(quiz => addIdField(quiz));
+    res.json(quizzesWithId);
   } catch (error) {
     console.error('Error fetching quizzes:', error);
     res.status(500).json({ message: 'Server error' });
@@ -21,7 +33,7 @@ router.get('/:id', async (req, res) => {
     if (!quiz) {
       return res.status(404).json({ message: 'Quiz not found' });
     }
-    res.json(quiz);
+    res.json(addIdField(quiz));
   } catch (error) {
     console.error(`Error fetching quiz ${req.params.id}:`, error);
     res.status(500).json({ message: 'Server error' });
@@ -44,7 +56,8 @@ router.get('/search', async (req, res) => {
       ]
     });
     
-    res.json(quizzes);
+    const quizzesWithId = quizzes.map(quiz => addIdField(quiz));
+    res.json(quizzesWithId);
   } catch (error) {
     console.error('Error searching quizzes:', error);
     res.status(500).json({ message: 'Server error' });
@@ -56,7 +69,7 @@ router.post('/', async (req, res) => {
   try {
     const quiz = new Quiz(req.body);
     const savedQuiz = await quiz.save();
-    res.status(201).json(savedQuiz);
+    res.status(201).json(addIdField(savedQuiz));
   } catch (error) {
     console.error('Error creating quiz:', error);
     res.status(500).json({ message: 'Server error' });
@@ -77,7 +90,7 @@ router.put('/:id', async (req, res) => {
       return res.status(404).json({ message: 'Quiz not found' });
     }
     
-    res.json(updatedQuiz);
+    res.json(addIdField(updatedQuiz));
   } catch (error) {
     console.error(`Error updating quiz ${req.params.id}:`, error);
     res.status(500).json({ message: 'Server error' });

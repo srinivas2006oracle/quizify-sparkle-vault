@@ -19,7 +19,8 @@ export interface Choice {
 }
 
 export interface Question {
-  id: string;
+  id?: string;
+  _id?: string; // MongoDB ID
   questionText: string;
   questionImageUrl?: string;
   questionTopicsList: string[];
@@ -33,11 +34,12 @@ export interface Question {
   updatedAt: string;
   createdBy: string;
   updatedBy: string;
-  correctChoiceIndex?: number; // Add this field to match the actual usage
+  correctChoiceIndex?: number;
 }
 
 export interface Quiz {
-  id: string;
+  id?: string;
+  _id?: string; // MongoDB ID
   quizTitle: string;
   quizDescription: string;
   quizTopicsList: string[];
@@ -53,7 +55,8 @@ export interface Quiz {
 }
 
 export interface QuizGame {
-  id: string;
+  id?: string;
+  _id?: string; // MongoDB ID
   gameTitle: string;
   gameScheduledStart: string;
   gameScheduledEnd: string;

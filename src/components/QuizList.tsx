@@ -17,11 +17,18 @@ const QuizList: React.FC<QuizListProps> = ({ quizzes, onDelete }) => {
   const { toast } = useToast();
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const handleEdit = (id: string) => {
+  // Helper function to get the correct ID from a quiz
+  const getQuizId = (quiz: Quiz): string => {
+    return quiz.id || quiz._id || "";
+  };
+
+  const handleEdit = (quiz: Quiz) => {
+    const id = getQuizId(quiz);
     navigate(`/edit/${id}`);
   };
 
-  const handleView = (id: string) => {
+  const handleView = (quiz: Quiz) => {
+    const id = getQuizId(quiz);
     navigate(`/view/${id}`);
   };
 
@@ -74,102 +81,105 @@ const QuizList: React.FC<QuizListProps> = ({ quizzes, onDelete }) => {
               </tr>
             </thead>
             <tbody>
-              {quizzes.map((quiz) => (
-                <tr key={quiz.id} className="border-t border-border hover:bg-muted/20 transition-colors">
-                  <td className="px-6 py-4 font-medium">
-                    <div className="flex items-center">
-                      <div 
-                        className={`w-2 h-2 rounded-full mr-2 ${
-                          quiz.readyForLive ? "bg-green-500" : "bg-amber-500"
-                        }`} 
-                      />
-                      {quiz.quizTitle}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 hidden md:table-cell text-muted-foreground">
-                    <div className="max-w-xs truncate">{quiz.quizDescription}</div>
-                  </td>
-                  <td className="px-6 py-4 hidden lg:table-cell">
-                    <div className="flex flex-wrap gap-1 max-w-xs">
-                      {quiz.quizTopicsList.slice(0, 2).map((topic, index) => (
-                        <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
-                          {topic}
-                        </span>
-                      ))}
-                      {quiz.quizTopicsList.length > 2 && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">
-                          +{quiz.quizTopicsList.length - 2}
-                        </span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 hidden lg:table-cell text-center">
-                    <span className="rounded-full bg-muted px-3 py-1 text-sm">
-                      {quiz.questions.length}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 hidden md:table-cell text-muted-foreground text-sm">
-                    <div className="flex items-center">
-                      <Calendar className="w-3 h-3 mr-1" />
-                      {formatDate(quiz.updatedAt)}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 hidden sm:table-cell">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      quiz.readyForLive 
-                        ? "bg-green-100 text-green-800" 
-                        : "bg-amber-100 text-amber-800"
-                    }`}>
-                      {quiz.readyForLive ? "Ready for Live" : "Draft"}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end space-x-2">
-                      <button
-                        onClick={() => handleView(quiz.id)}
-                        className="button-icon text-muted-foreground hover:text-foreground hover:bg-muted"
-                        aria-label="View quiz"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleEdit(quiz.id)}
-                        className="button-icon text-muted-foreground hover:text-primary hover:bg-primary/10"
-                        aria-label="Edit quiz"
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <button
-                            className="button-icon text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                            aria-label="Delete quiz"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent className="glassmorphic">
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This will permanently delete the quiz "{quiz.quizTitle}" and all its questions. This action cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel className="border border-border/50">Cancel</AlertDialogCancel>
-                            <AlertDialogAction 
-                              onClick={() => onDelete(quiz.id)}
-                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              {quizzes.map((quiz) => {
+                const quizId = getQuizId(quiz);
+                return (
+                  <tr key={quizId} className="border-t border-border hover:bg-muted/20 transition-colors">
+                    <td className="px-6 py-4 font-medium">
+                      <div className="flex items-center">
+                        <div 
+                          className={`w-2 h-2 rounded-full mr-2 ${
+                            quiz.readyForLive ? "bg-green-500" : "bg-amber-500"
+                          }`} 
+                        />
+                        {quiz.quizTitle}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 hidden md:table-cell text-muted-foreground">
+                      <div className="max-w-xs truncate">{quiz.quizDescription}</div>
+                    </td>
+                    <td className="px-6 py-4 hidden lg:table-cell">
+                      <div className="flex flex-wrap gap-1 max-w-xs">
+                        {quiz.quizTopicsList.slice(0, 2).map((topic, index) => (
+                          <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                            {topic}
+                          </span>
+                        ))}
+                        {quiz.quizTopicsList.length > 2 && (
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">
+                            +{quiz.quizTopicsList.length - 2}
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 hidden lg:table-cell text-center">
+                      <span className="rounded-full bg-muted px-3 py-1 text-sm">
+                        {quiz.questions.length}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 hidden md:table-cell text-muted-foreground text-sm">
+                      <div className="flex items-center">
+                        <Calendar className="w-3 h-3 mr-1" />
+                        {formatDate(quiz.updatedAt)}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 hidden sm:table-cell">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        quiz.readyForLive 
+                          ? "bg-green-100 text-green-800" 
+                          : "bg-amber-100 text-amber-800"
+                      }`}>
+                        {quiz.readyForLive ? "Ready for Live" : "Draft"}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end space-x-2">
+                        <button
+                          onClick={() => handleView(quiz)}
+                          className="button-icon text-muted-foreground hover:text-foreground hover:bg-muted"
+                          aria-label="View quiz"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleEdit(quiz)}
+                          className="button-icon text-muted-foreground hover:text-primary hover:bg-primary/10"
+                          aria-label="Edit quiz"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <button
+                              className="button-icon text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                              aria-label="Delete quiz"
                             >
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent className="glassmorphic">
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This will permanently delete the quiz "{quiz.quizTitle}" and all its questions. This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel className="border border-border/50">Cancel</AlertDialogCancel>
+                              <AlertDialogAction 
+                                onClick={() => onDelete(quizId)}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

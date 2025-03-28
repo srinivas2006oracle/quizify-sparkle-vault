@@ -14,12 +14,18 @@ const Index = () => {
   const [isSearching, setIsSearching] = useState(false);
   const { toast } = useToast();
 
+  // Helper function to get the correct ID from a quiz
+  const getQuizId = (quiz: Quiz): string => {
+    return quiz.id || quiz._id || "";
+  };
+
   // Load quizzes on initial mount
   useEffect(() => {
     const fetchQuizzes = async () => {
       setIsLoading(true);
       try {
         const data = await loadQuizzes();
+        console.log("Loaded quizzes:", data);
         setQuizzes(data);
         setSearchResults(data);
       } catch (error) {
@@ -62,10 +68,18 @@ const Index = () => {
   }, [quizzes, toast]);
 
   const handleDelete = async (id: string) => {
+    if (!id) return;
+    
     try {
       await deleteQuiz(id);
-      setQuizzes(prevQuizzes => prevQuizzes.filter(quiz => quiz.id !== id));
-      setSearchResults(prevResults => prevResults.filter(quiz => quiz.id !== id));
+      // After deletion, update both arrays using the correct ID
+      setQuizzes(prevQuizzes => prevQuizzes.filter(quiz => 
+        getQuizId(quiz) !== id
+      ));
+      setSearchResults(prevResults => prevResults.filter(quiz => 
+        getQuizId(quiz) !== id
+      ));
+      
       toast({
         title: "Quiz deleted",
         description: "The quiz has been successfully deleted.",
