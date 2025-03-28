@@ -4,7 +4,7 @@ import QuizSearch from "@/components/QuizSearch";
 import QuizList from "@/components/QuizList";
 import Header from "@/components/Header";
 import { Quiz } from "@/types/quiz";
-import { loadQuizzes, searchQuizzes, deleteQuiz } from "@/utils/quizUtils";
+import { loadQuizzes, searchQuizzes, deleteQuiz, getQuizId } from "@/utils/quizUtils";
 import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
@@ -14,11 +14,6 @@ const Index = () => {
   const [isSearching, setIsSearching] = useState(false);
   const { toast } = useToast();
 
-  // Helper function to get the correct ID from a quiz
-  const getQuizId = (quiz: Quiz): string => {
-    return quiz.id || quiz._id?.toString() || "";
-  };
-
   // Load quizzes on initial mount
   useEffect(() => {
     const fetchQuizzes = async () => {
@@ -26,8 +21,15 @@ const Index = () => {
       try {
         const data = await loadQuizzes();
         console.log("Loaded quizzes:", data);
-        setQuizzes(data);
-        setSearchResults(data);
+        
+        // Ensure each quiz has a valid id
+        const quizzesWithValidId = data.map(quiz => ({
+          ...quiz,
+          id: getQuizId(quiz)
+        }));
+        
+        setQuizzes(quizzesWithValidId);
+        setSearchResults(quizzesWithValidId);
       } catch (error) {
         console.error("Error loading quizzes:", error);
         toast({
@@ -53,9 +55,27 @@ const Index = () => {
     
     try {
       setIsSearching(true);
+      console.log("Index page: Searching for term:", searchTerm);
       const results = await searchQuizzes(searchTerm);
-      console.log("Search results:", results);
-      setSearchResults(results);
+      console.log("Search results received:", results);
+      
+      if (results && Array.isArray(results)) {
+        // Ensure each result has a valid id
+        const resultsWithValidId = results.map(quiz => ({
+          ...quiz,
+          id: getQuizId(quiz)
+        }));
+        
+        setSearchResults(resultsWithValidId);
+      } else {
+        console.error("Invalid search results format:", results);
+        setSearchResults([]);
+        toast({
+          title: "Error",
+          description: "Received invalid search results format.",
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       console.error("Error searching quizzes:", error);
       toast({

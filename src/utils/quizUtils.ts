@@ -148,7 +148,14 @@ export const searchQuizzes = async (searchTerm: string): Promise<Quiz[]> => {
   
   try {
     console.log("Searching quizzes for term:", searchTerm);
-    return await apiService.searchQuizzes(searchTerm);
+    const results = await apiService.searchQuizzes(searchTerm);
+    console.log("Search results:", results);
+    
+    // Ensure all results have a valid id field
+    return results.map(quiz => ({
+      ...quiz,
+      id: getQuizId(quiz)
+    }));
   } catch (error) {
     console.error('Error searching quizzes:', error);
     throw error;

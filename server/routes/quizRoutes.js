@@ -27,7 +27,6 @@ router.get('/', async (req, res) => {
 });
 
 // SEARCH quizzes by title, description, or topics
-// Important: This route must be defined BEFORE the /:id route to avoid conflicts
 router.get('/search', async (req, res) => {
   try {
     const { term } = req.query;
@@ -35,19 +34,23 @@ router.get('/search', async (req, res) => {
       return res.json([]);
     }
 
+    console.log(`Searching for term: "${term}"`);
+    
     const quizzes = await Quiz.find({
       $or: [
         { quizTitle: { $regex: term, $options: 'i' } },
         { quizDescription: { $regex: term, $options: 'i' } },
-        { quizTopicsList: { $in: [new RegExp(term, 'i')] } }
+        { quizTopicsList: { $elemMatch: { $regex: term, $options: 'i' } } }
       ]
     });
+    
+    console.log(`Found ${quizzes.length} quizzes matching term: "${term}"`);
     
     const quizzesWithId = quizzes.map(quiz => addIdField(quiz));
     res.json(quizzesWithId);
   } catch (error) {
     console.error('Error searching quizzes:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 

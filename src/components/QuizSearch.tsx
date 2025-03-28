@@ -22,6 +22,7 @@ const QuizSearch = ({ onSearch }: QuizSearchProps) => {
     }
     
     timeoutRef.current = setTimeout(() => {
+      console.log("Initiating search for term:", term);
       onSearch(term);
     }, 500); // Increased debounce time to 500ms
   }, [onSearch]);
@@ -69,6 +70,7 @@ const QuizSearch = ({ onSearch }: QuizSearchProps) => {
             <button
               className="absolute right-4 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
               onClick={() => setSearchTerm("")}
+              aria-label="Clear search"
             >
               ×
             </button>

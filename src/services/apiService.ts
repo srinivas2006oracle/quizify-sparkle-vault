@@ -49,13 +49,20 @@ export const apiService = {
     
     try {
       console.log("Searching quizzes for term:", searchTerm);
-      // Note: Using the correct search endpoint pattern
-      const response = await fetch(`${API_BASE_URL}/quizzes/search?term=${encodeURIComponent(searchTerm)}`);
+      const url = `${API_BASE_URL}/quizzes/search?term=${encodeURIComponent(searchTerm.trim())}`;
+      console.log("Search URL:", url);
+      
+      const response = await fetch(url);
+      
       if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
+        const errorText = await response.text();
+        console.error("Search error details:", errorText);
+        throw new Error(`Error ${response.status}: ${errorText}`);
       }
       
       const data = await response.json();
+      console.log("Search results:", data);
+      
       // Normalize the quiz data
       const normalizedData = data.map(normalizeQuiz);
       
