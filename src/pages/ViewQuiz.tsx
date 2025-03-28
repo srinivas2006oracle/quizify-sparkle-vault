@@ -191,29 +191,35 @@ const ViewQuiz = () => {
                       )}
 
                       <div className="space-y-2 mb-4">
-                        {question.choices.map((choice, choiceIndex) => (
-                          <div 
-                            key={choiceIndex} 
-                            className={`flex items-center gap-3 p-3 rounded-md ${
-                              question.correctChoiceIndex === choiceIndex
-                                ? "bg-green-50 border border-green-200"
-                                : "bg-muted/30"
-                            }`}
-                          >
+                        {question.choices.map((choice, choiceIndex) => {
+                          const isCorrect = choice.isCorrectChoice || 
+                                          (question.correctChoiceIndex !== undefined && 
+                                           question.correctChoiceIndex === choiceIndex);
+                          
+                          return (
                             <div 
-                              className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center ${
-                                question.correctChoiceIndex === choiceIndex
-                                  ? "bg-green-500 text-white"
-                                  : "bg-muted"
+                              key={choiceIndex} 
+                              className={`flex items-center gap-3 p-3 rounded-md ${
+                                isCorrect
+                                  ? "bg-green-50 border border-green-200"
+                                  : "bg-muted/30"
                               }`}
                             >
-                              {question.correctChoiceIndex === choiceIndex && (
-                                <Check className="w-3 h-3" />
-                              )}
+                              <div 
+                                className={`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center ${
+                                  isCorrect
+                                    ? "bg-green-500 text-white"
+                                    : "bg-muted"
+                                }`}
+                              >
+                                {isCorrect && (
+                                  <Check className="w-3 h-3" />
+                                )}
+                              </div>
+                              <span>{choice.choiceText}</span>
                             </div>
-                            <span>{choice}</span>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
 
                       {question.answerExplanation && (

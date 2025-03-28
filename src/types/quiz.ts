@@ -33,6 +33,7 @@ export interface Question {
   updatedAt: string;
   createdBy: string;
   updatedBy: string;
+  correctChoiceIndex?: number; // Add this field to match the actual usage
 }
 
 export interface Quiz {

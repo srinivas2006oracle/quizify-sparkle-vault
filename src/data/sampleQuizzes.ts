@@ -21,13 +21,28 @@ export const sampleQuizzes: Quiz[] = [
         questionText: "What does HTML stand for?",
         questionTopicsList: ["HTML", "Web Development"],
         choices: [
-          "Hyper Text Markup Language",
-          "High Tech Modern Language",
-          "Hyper Transfer Markup Language",
-          "Home Tool Markup Language"
+          {
+            choiceIndex: 0,
+            choiceText: "Hyper Text Markup Language",
+            isCorrectChoice: true
+          },
+          {
+            choiceIndex: 1,
+            choiceText: "High Tech Modern Language",
+            isCorrectChoice: false
+          },
+          {
+            choiceIndex: 2,
+            choiceText: "Hyper Transfer Markup Language",
+            isCorrectChoice: false
+          },
+          {
+            choiceIndex: 3,
+            choiceText: "Home Tool Markup Language",
+            isCorrectChoice: false
+          }
         ],
         correctChoiceIndex: 0,
-        correctAnswer: "Hyper Text Markup Language",
         answerExplanation: "HTML stands for Hyper Text Markup Language. It is the standard markup language for creating web pages.",
         templateCategory: "Technology",
         difficultyLevel: "Easy",
@@ -43,13 +58,28 @@ export const sampleQuizzes: Quiz[] = [
         questionText: "Which property is used to change the background color in CSS?",
         questionTopicsList: ["CSS", "Web Development"],
         choices: [
-          "color",
-          "bgcolor",
-          "background-color",
-          "background"
+          {
+            choiceIndex: 0,
+            choiceText: "color",
+            isCorrectChoice: false
+          },
+          {
+            choiceIndex: 1,
+            choiceText: "bgcolor",
+            isCorrectChoice: false
+          },
+          {
+            choiceIndex: 2,
+            choiceText: "background-color",
+            isCorrectChoice: true
+          },
+          {
+            choiceIndex: 3,
+            choiceText: "background",
+            isCorrectChoice: false
+          }
         ],
         correctChoiceIndex: 2,
-        correctAnswer: "background-color",
         answerExplanation: "The background-color property is used to specify the background color of an element in CSS.",
         templateCategory: "Technology",
         difficultyLevel: "Easy",
@@ -65,13 +95,28 @@ export const sampleQuizzes: Quiz[] = [
         questionText: "Which JavaScript method is used to add a new element to the end of an array?",
         questionTopicsList: ["JavaScript", "Web Development"],
         choices: [
-          "push()",
-          "append()",
-          "add()",
-          "insert()"
+          {
+            choiceIndex: 0,
+            choiceText: "push()",
+            isCorrectChoice: true
+          },
+          {
+            choiceIndex: 1,
+            choiceText: "append()",
+            isCorrectChoice: false
+          },
+          {
+            choiceIndex: 2,
+            choiceText: "add()",
+            isCorrectChoice: false
+          },
+          {
+            choiceIndex: 3,
+            choiceText: "insert()",
+            isCorrectChoice: false
+          }
         ],
         correctChoiceIndex: 0,
-        correctAnswer: "push()",
         answerExplanation: "The push() method adds one or more elements to the end of an array and returns the new length of the array.",
         templateCategory: "Technology",
         difficultyLevel: "Medium",
@@ -103,13 +148,28 @@ export const sampleQuizzes: Quiz[] = [
         questionText: "Which Python library is commonly used for data manipulation and analysis?",
         questionTopicsList: ["Python", "Data Science"],
         choices: [
-          "NumPy",
-          "Pandas",
-          "Matplotlib",
-          "TensorFlow"
+          {
+            choiceIndex: 0,
+            choiceText: "NumPy",
+            isCorrectChoice: false
+          },
+          {
+            choiceIndex: 1,
+            choiceText: "Pandas",
+            isCorrectChoice: true
+          },
+          {
+            choiceIndex: 2,
+            choiceText: "Matplotlib",
+            isCorrectChoice: false
+          },
+          {
+            choiceIndex: 3,
+            choiceText: "TensorFlow",
+            isCorrectChoice: false
+          }
         ],
         correctChoiceIndex: 1,
-        correctAnswer: "Pandas",
         answerExplanation: "Pandas is a powerful Python library used for data manipulation and analysis, providing data structures like DataFrame for efficiently storing and manipulating tabular data.",
         templateCategory: "Technology",
         difficultyLevel: "Medium",
@@ -125,13 +185,28 @@ export const sampleQuizzes: Quiz[] = [
         questionText: "What is a confusion matrix used for?",
         questionTopicsList: ["Machine Learning", "Data Science", "Statistics"],
         choices: [
-          "To visualize data distributions",
-          "To evaluate regression models",
-          "To evaluate classification models",
-          "To perform dimensionality reduction"
+          {
+            choiceIndex: 0,
+            choiceText: "To visualize data distributions",
+            isCorrectChoice: false
+          },
+          {
+            choiceIndex: 1,
+            choiceText: "To evaluate regression models",
+            isCorrectChoice: false
+          },
+          {
+            choiceIndex: 2,
+            choiceText: "To evaluate classification models",
+            isCorrectChoice: true
+          },
+          {
+            choiceIndex: 3,
+            choiceText: "To perform dimensionality reduction",
+            isCorrectChoice: false
+          }
         ],
         correctChoiceIndex: 2,
-        correctAnswer: "To evaluate classification models",
         answerExplanation: "A confusion matrix is used to evaluate the performance of a classification model by showing the counts of true positives, false positives, true negatives, and false negatives.",
         templateCategory: "Technology",
         difficultyLevel: "Hard",
@@ -163,13 +238,28 @@ export const sampleQuizzes: Quiz[] = [
         questionText: "What is deep learning?",
         questionTopicsList: ["Artificial Intelligence", "Deep Learning", "Neural Networks"],
         choices: [
-          "A type of computer hardware",
-          "A subset of machine learning using neural networks with many layers",
-          "A programming language for AI",
-          "A database management system for large datasets"
+          {
+            choiceIndex: 0,
+            choiceText: "A type of computer hardware",
+            isCorrectChoice: false
+          },
+          {
+            choiceIndex: 1,
+            choiceText: "A subset of machine learning using neural networks with many layers",
+            isCorrectChoice: true
+          },
+          {
+            choiceIndex: 2,
+            choiceText: "A programming language for AI",
+            isCorrectChoice: false
+          },
+          {
+            choiceIndex: 3,
+            choiceText: "A database management system for large datasets",
+            isCorrectChoice: false
+          }
         ],
         correctChoiceIndex: 1,
-        correctAnswer: "A subset of machine learning using neural networks with many layers",
         answerExplanation: "Deep learning is a subset of machine learning that uses neural networks with multiple layers (deep neural networks) to analyze various factors of data.",
         templateCategory: "Technology",
         difficultyLevel: "Medium",
@@ -185,13 +275,28 @@ export const sampleQuizzes: Quiz[] = [
         questionText: "Which of the following is NOT a common type of neural network?",
         questionTopicsList: ["Neural Networks", "Artificial Intelligence"],
         choices: [
-          "Convolutional Neural Network (CNN)",
-          "Recurrent Neural Network (RNN)",
-          "Quantum Neural Network (QNN)",
-          "Systematic Neural Network (SNN)"
+          {
+            choiceIndex: 0,
+            choiceText: "Convolutional Neural Network (CNN)",
+            isCorrectChoice: false
+          },
+          {
+            choiceIndex: 1,
+            choiceText: "Recurrent Neural Network (RNN)",
+            isCorrectChoice: false
+          },
+          {
+            choiceIndex: 2,
+            choiceText: "Quantum Neural Network (QNN)",
+            isCorrectChoice: false
+          },
+          {
+            choiceIndex: 3,
+            choiceText: "Systematic Neural Network (SNN)",
+            isCorrectChoice: true
+          }
         ],
         correctChoiceIndex: 3,
-        correctAnswer: "Systematic Neural Network (SNN)",
         answerExplanation: "Systematic Neural Network (SNN) is a fictional type. Common types include CNN, RNN, GAN, and others, but SNN is not a standard neural network architecture.",
         templateCategory: "Technology",
         difficultyLevel: "Hard",
