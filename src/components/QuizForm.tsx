@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { PlusCircle, Trash2, Save, X, ArrowLeft, Check } from "lucide-react";
-import { Quiz, Question } from "@/types/quiz";
-import { createEmptyQuestion } from "@/utils/quizUtils";
+import { Quiz, Question, Choice } from "@/types/quiz";
+import { createEmptyQuestion, createEmptyChoice } from "@/utils/quizUtils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -115,14 +115,6 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialQuiz, onSave, isEditing }) =
         [field]: value,
         updatedAt: new Date().toISOString(),
       };
-
-      if (field === "correctChoiceIndex") {
-        const choiceIndex = value as number;
-        if (choiceIndex >= 0 && choiceIndex < newQuestions[index].choices.length) {
-          newQuestions[index].correctAnswer = newQuestions[index].choices[choiceIndex];
-        }
-      }
-
       return {
         ...prev,
         questions: newQuestions,
@@ -131,14 +123,23 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialQuiz, onSave, isEditing }) =
     });
   };
 
-  const handleChoiceChange = (questionIndex: number, choiceIndex: number, value: string) => {
+  const handleChoiceChange = (questionIndex: number, choiceIndex: number, field: keyof Choice, value: any) => {
     setQuiz((prev) => {
       const newQuestions = [...prev.questions];
       const newChoices = [...newQuestions[questionIndex].choices];
-      newChoices[choiceIndex] = value;
-
-      if (choiceIndex === newQuestions[questionIndex].correctChoiceIndex) {
-        newQuestions[questionIndex].correctAnswer = value;
+      
+      newChoices[choiceIndex] = {
+        ...newChoices[choiceIndex],
+        [field]: value
+      };
+      
+      // If we're setting this choice as correct, make sure others are not correct
+      if (field === 'isCorrectChoice' && value === true) {
+        newChoices.forEach((choice, idx) => {
+          if (idx !== choiceIndex) {
+            choice.isCorrectChoice = false;
+          }
+        });
       }
 
       newQuestions[questionIndex] = {
@@ -158,9 +159,11 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialQuiz, onSave, isEditing }) =
   const handleAddChoice = (questionIndex: number) => {
     setQuiz((prev) => {
       const newQuestions = [...prev.questions];
+      const newChoiceIndex = newQuestions[questionIndex].choices.length;
+      
       newQuestions[questionIndex] = {
         ...newQuestions[questionIndex],
-        choices: [...newQuestions[questionIndex].choices, ""],
+        choices: [...newQuestions[questionIndex].choices, createEmptyChoice(newChoiceIndex)],
         updatedAt: new Date().toISOString(),
       };
 
@@ -186,19 +189,15 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialQuiz, onSave, isEditing }) =
       const newQuestions = [...prev.questions];
       const newChoices = [...newQuestions[questionIndex].choices];
       newChoices.splice(choiceIndex, 1);
-
-      let newCorrectChoiceIndex = newQuestions[questionIndex].correctChoiceIndex;
-      if (choiceIndex === newCorrectChoiceIndex) {
-        newCorrectChoiceIndex = 0;
-        newQuestions[questionIndex].correctAnswer = newChoices[0];
-      } else if (choiceIndex < newCorrectChoiceIndex) {
-        newCorrectChoiceIndex--;
-      }
+      
+      // Reindex the remaining choices
+      newChoices.forEach((choice, idx) => {
+        choice.choiceIndex = idx;
+      });
 
       newQuestions[questionIndex] = {
         ...newQuestions[questionIndex],
         choices: newChoices,
-        correctChoiceIndex: newCorrectChoiceIndex,
         updatedAt: new Date().toISOString(),
       };
 
@@ -277,7 +276,7 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialQuiz, onSave, isEditing }) =
 
     for (let i = 0; i < quiz.questions.length; i++) {
       const question = quiz.questions[i];
-      const emptyChoiceIndex = question.choices.findIndex(c => !c.trim());
+      const emptyChoiceIndex = question.choices.findIndex(c => !c.choiceText.trim());
       if (emptyChoiceIndex !== -1) {
         toast({
           title: "Missing information",
@@ -526,19 +525,19 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialQuiz, onSave, isEditing }) =
                           <div key={choiceIndex} className="flex items-center gap-2">
                             <div 
                               className={`flex-shrink-0 w-5 h-5 rounded-full border flex items-center justify-center ${
-                                quiz.questions[activeQuestionIndex].correctChoiceIndex === choiceIndex
+                                choice.isCorrectChoice
                                   ? "bg-primary border-primary text-white"
                                   : "border-muted-foreground"
                               }`}
-                              onClick={() => handleQuestionChange(activeQuestionIndex, "correctChoiceIndex", choiceIndex)}
+                              onClick={() => handleChoiceChange(activeQuestionIndex, choiceIndex, "isCorrectChoice", true)}
                             >
-                              {quiz.questions[activeQuestionIndex].correctChoiceIndex === choiceIndex && (
+                              {choice.isCorrectChoice && (
                                 <Check className="w-3 h-3" />
                               )}
                             </div>
                             <Input
-                              value={choice}
-                              onChange={(e) => handleChoiceChange(activeQuestionIndex, choiceIndex, e.target.value)}
+                              value={choice.choiceText}
+                              onChange={(e) => handleChoiceChange(activeQuestionIndex, choiceIndex, "choiceText", e.target.value)}
                               placeholder={`Choice ${choiceIndex + 1}`}
                               className="flex-1"
                             />

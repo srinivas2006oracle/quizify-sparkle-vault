@@ -1,7 +1,7 @@
 
 import { Quiz } from "@/types/quiz";
 
-const API_BASE_URL = "https://api.example.com"; // Replace with your actual API URL
+const API_BASE_URL = "http://localhost:5000/api"; // Change this to your actual API URL
 
 // Cache for search results to reduce API calls
 const searchCache = new Map<string, { data: Quiz[], timestamp: number }>();

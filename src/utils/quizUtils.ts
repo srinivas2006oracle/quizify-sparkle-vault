@@ -1,5 +1,5 @@
 
-import { Quiz, Question } from "@/types/quiz";
+import { Quiz, Question, Choice } from "@/types/quiz";
 import { apiService } from "@/services/apiService";
 
 // Function to generate a unique ID
@@ -19,6 +19,17 @@ export const formatDate = (dateString: string): string => {
   });
 };
 
+// Create a new empty choice
+export const createEmptyChoice = (index: number): Choice => {
+  return {
+    choiceIndex: index,
+    choiceText: "",
+    choiceImageurl: "",
+    choiceResponses: [],
+    isCorrectChoice: false
+  };
+};
+
 // Create a new empty question template
 export const createEmptyQuestion = (): Question => {
   const now = new Date().toISOString();
@@ -26,9 +37,12 @@ export const createEmptyQuestion = (): Question => {
     id: generateId(),
     questionText: "",
     questionTopicsList: [],
-    choices: ["", "", "", ""],
-    correctChoiceIndex: 0,
-    correctAnswer: "",
+    choices: [
+      createEmptyChoice(0),
+      createEmptyChoice(1),
+      createEmptyChoice(2),
+      createEmptyChoice(3)
+    ],
     answerExplanation: "",
     templateCategory: "",
     difficultyLevel: "Medium",
