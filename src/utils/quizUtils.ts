@@ -106,7 +106,19 @@ export const getQuiz = async (id: string): Promise<Quiz | undefined> => {
 // Create a new quiz
 export const createQuiz = async (quiz: Quiz): Promise<Quiz> => {
   try {
-    return await apiService.createQuiz(quiz);
+    // Process quiz questions before saving to ensure each has a correct choice
+    const processedQuiz = {
+      ...quiz,
+      questions: quiz.questions.map(question => {
+        const correctChoiceIndex = question.choices.findIndex(c => c.isCorrectChoice);
+        return {
+          ...question,
+          correctChoiceIndex: correctChoiceIndex !== -1 ? correctChoiceIndex : -1
+        };
+      })
+    };
+    
+    return await apiService.createQuiz(processedQuiz);
   } catch (error) {
     console.error('Error creating quiz:', error);
     throw error;
@@ -121,7 +133,19 @@ export const updateQuiz = async (updatedQuiz: Quiz): Promise<Quiz> => {
   }
   
   try {
-    return await apiService.updateQuiz(updatedQuiz);
+    // Process quiz questions before saving to ensure each has a correct choice
+    const processedQuiz = {
+      ...updatedQuiz,
+      questions: updatedQuiz.questions.map(question => {
+        const correctChoiceIndex = question.choices.findIndex(c => c.isCorrectChoice);
+        return {
+          ...question,
+          correctChoiceIndex: correctChoiceIndex !== -1 ? correctChoiceIndex : question.correctChoiceIndex
+        };
+      })
+    };
+    
+    return await apiService.updateQuiz(processedQuiz);
   } catch (error) {
     console.error(`Error updating quiz ${id}:`, error);
     throw error;
@@ -144,12 +168,9 @@ export const deleteQuiz = async (id: string): Promise<void> => {
 
 // Search quizzes by term (title, description, topics)
 export const searchQuizzes = async (searchTerm: string): Promise<Quiz[]> => {
-  if (!searchTerm.trim()) return [];
-  
   try {
     console.log("Searching quizzes for term:", searchTerm);
     const results = await apiService.searchQuizzes(searchTerm);
-    console.log("Search results:", results);
     
     // Ensure all results have a valid id field
     return results.map(quiz => ({
@@ -158,6 +179,6 @@ export const searchQuizzes = async (searchTerm: string): Promise<Quiz[]> => {
     }));
   } catch (error) {
     console.error('Error searching quizzes:', error);
-    throw error;
+    return []; // Return empty array instead of throwing
   }
 };

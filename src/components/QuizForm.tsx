@@ -140,6 +140,9 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialQuiz, onSave, isEditing }) =
             choice.isCorrectChoice = false;
           }
         });
+        
+        // Update correctChoiceIndex when marking a choice as correct
+        newQuestions[questionIndex].correctChoiceIndex = choiceIndex;
       }
 
       newQuestions[questionIndex] = {
@@ -188,12 +191,24 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialQuiz, onSave, isEditing }) =
     setQuiz((prev) => {
       const newQuestions = [...prev.questions];
       const newChoices = [...newQuestions[questionIndex].choices];
+      
+      // Check if we're removing the correct choice
+      const isRemovingCorrectChoice = newChoices[choiceIndex].isCorrectChoice;
+      
       newChoices.splice(choiceIndex, 1);
       
       // Reindex the remaining choices
       newChoices.forEach((choice, idx) => {
         choice.choiceIndex = idx;
       });
+
+      // Update correctChoiceIndex if needed
+      if (isRemovingCorrectChoice) {
+        newQuestions[questionIndex].correctChoiceIndex = -1;
+      } else if (newQuestions[questionIndex].correctChoiceIndex > choiceIndex) {
+        // Adjust correctChoiceIndex if it's after the removed choice
+        newQuestions[questionIndex].correctChoiceIndex--;
+      }
 
       newQuestions[questionIndex] = {
         ...newQuestions[questionIndex],
@@ -251,7 +266,7 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialQuiz, onSave, isEditing }) =
     });
   };
 
-  const handleSave = () => {
+  const validateQuiz = () => {
     if (!quiz.quizTitle.trim()) {
       toast({
         title: "Missing information",
@@ -259,7 +274,7 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialQuiz, onSave, isEditing }) =
         variant: "destructive",
       });
       setActiveTab("details");
-      return;
+      return false;
     }
 
     const invalidQuestionIndex = quiz.questions.findIndex(q => !q.questionText.trim());
@@ -271,9 +286,26 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialQuiz, onSave, isEditing }) =
       });
       setActiveTab("questions");
       setActiveQuestionIndex(invalidQuestionIndex);
-      return;
+      return false;
     }
 
+    // Check for questions without correct answers
+    const missingCorrectAnswerIndex = quiz.questions.findIndex(q => 
+      !q.choices.some(choice => choice.isCorrectChoice)
+    );
+    
+    if (missingCorrectAnswerIndex !== -1) {
+      toast({
+        title: "Missing correct answer",
+        description: `Question ${missingCorrectAnswerIndex + 1} doesn't have a correct answer selected.`,
+        variant: "destructive",
+      });
+      setActiveTab("questions");
+      setActiveQuestionIndex(missingCorrectAnswerIndex);
+      return false;
+    }
+
+    // Check for empty choices
     for (let i = 0; i < quiz.questions.length; i++) {
       const question = quiz.questions[i];
       const emptyChoiceIndex = question.choices.findIndex(c => !c.choiceText.trim());
@@ -285,16 +317,31 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialQuiz, onSave, isEditing }) =
         });
         setActiveTab("questions");
         setActiveQuestionIndex(i);
-        return;
+        return false;
       }
     }
 
-    onSave(quiz);
-    toast({
-      title: `Quiz ${isEditing ? "updated" : "created"} successfully`,
-      description: `"${quiz.quizTitle}" has been ${isEditing ? "updated" : "saved"}.`,
-    });
-    navigate("/");
+    return true;
+  };
+
+  const handleSave = () => {
+    if (!validateQuiz()) {
+      return;
+    }
+
+    // Ensure each question has a correctChoiceIndex set
+    const quizWithCorrectIndices = {
+      ...quiz,
+      questions: quiz.questions.map(question => {
+        const correctIndex = question.choices.findIndex(choice => choice.isCorrectChoice);
+        return {
+          ...question,
+          correctChoiceIndex: correctIndex !== -1 ? correctIndex : question.correctChoiceIndex
+        };
+      })
+    };
+
+    onSave(quizWithCorrectIndices);
   };
 
   const handleCancel = () => {

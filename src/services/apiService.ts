@@ -1,4 +1,3 @@
-
 import { Quiz } from "@/types/quiz";
 
 const API_BASE_URL = "http://localhost:5000/api"; // Change this to your actual API URL
@@ -33,24 +32,16 @@ export const apiService = {
   },
 
   async searchQuizzes(searchTerm: string): Promise<Quiz[]> {
-    // If empty search term, return empty results
-    if (!searchTerm.trim()) {
-      return [];
-    }
-    
-    // Check cache first
-    const cacheKey = searchTerm.trim().toLowerCase();
-    const cachedResult = searchCache.get(cacheKey);
-    
-    if (cachedResult && Date.now() - cachedResult.timestamp < CACHE_TTL) {
-      console.log("Using cached search results for:", searchTerm);
-      return cachedResult.data;
-    }
-    
     try {
-      console.log("Searching quizzes for term:", searchTerm);
-      const url = `${API_BASE_URL}/quizzes/search?term=${encodeURIComponent(searchTerm.trim())}`;
-      console.log("Search URL:", url);
+      let url = `${API_BASE_URL}/quizzes`;
+      
+      // If search term is not empty, use the search endpoint
+      if (searchTerm.trim()) {
+        url = `${API_BASE_URL}/quizzes/search?term=${encodeURIComponent(searchTerm.trim())}`;
+        console.log("Search URL:", url);
+      } else {
+        console.log("Empty search term, fetching all quizzes");
+      }
       
       const response = await fetch(url);
       
@@ -61,21 +52,23 @@ export const apiService = {
       }
       
       const data = await response.json();
-      console.log("Search results:", data);
+      console.log(`Found ${data.length} quizzes for term: "${searchTerm}"`);
       
-      // Normalize the quiz data
-      const normalizedData = data.map(normalizeQuiz);
-      
-      // Cache the result
-      searchCache.set(cacheKey, {
-        data: normalizedData,
-        timestamp: Date.now()
+      // Normalize the quiz data and ensure id is properly set
+      const normalizedData = data.map((quiz: any) => {
+        const normalizedQuiz = normalizeQuiz(quiz);
+        // Double-check that we have an id property
+        if (!normalizedQuiz.id && normalizedQuiz._id) {
+          normalizedQuiz.id = normalizedQuiz._id.toString();
+        }
+        return normalizedQuiz;
       });
       
       return normalizedData;
     } catch (error) {
       console.error("Error searching quizzes:", error);
-      throw error;
+      // Return empty array on error instead of throwing
+      return [];
     }
   },
 

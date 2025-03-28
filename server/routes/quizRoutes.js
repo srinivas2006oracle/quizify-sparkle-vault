@@ -30,8 +30,10 @@ router.get('/', async (req, res) => {
 router.get('/search', async (req, res) => {
   try {
     const { term } = req.query;
-    if (!term) {
-      return res.json([]);
+    if (!term || !term.trim()) {
+      const allQuizzes = await Quiz.find();
+      const quizzesWithId = allQuizzes.map(quiz => addIdField(quiz));
+      return res.json(quizzesWithId);
     }
 
     console.log(`Searching for term: "${term}"`);

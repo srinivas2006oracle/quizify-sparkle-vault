@@ -24,12 +24,18 @@ const QuizSearch = ({ onSearch }: QuizSearchProps) => {
     timeoutRef.current = setTimeout(() => {
       console.log("Initiating search for term:", term);
       onSearch(term);
-    }, 500); // Increased debounce time to 500ms
+    }, 500); // Debounce time of 500ms
   }, [onSearch]);
 
   // Only search when the searchTerm changes
   useEffect(() => {
-    debouncedSearch(searchTerm);
+    if (searchTerm.trim()) {
+      debouncedSearch(searchTerm);
+    } else {
+      // If search term is empty, we still want to trigger onSearch with empty string
+      // to reset the search results to show all quizzes
+      onSearch("");
+    }
     
     // Clean up timeout on unmount
     return () => {
@@ -37,7 +43,7 @@ const QuizSearch = ({ onSearch }: QuizSearchProps) => {
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [searchTerm, debouncedSearch]);
+  }, [searchTerm, debouncedSearch, onSearch]);
 
   const handleCreateNew = () => {
     navigate("/create");
@@ -69,7 +75,10 @@ const QuizSearch = ({ onSearch }: QuizSearchProps) => {
           {searchTerm && (
             <button
               className="absolute right-4 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
-              onClick={() => setSearchTerm("")}
+              onClick={() => {
+                setSearchTerm("");
+                onSearch("");
+              }}
               aria-label="Clear search"
             >
               ×
