@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
     res.json(quizzesWithId);
   } catch (error) {
     console.error('Error fetching quizzes:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
@@ -66,19 +66,32 @@ router.get('/:id', async (req, res) => {
     res.json(addIdField(quiz));
   } catch (error) {
     console.error(`Error fetching quiz ${req.params.id}:`, error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
 // CREATE a new quiz
 router.post('/', async (req, res) => {
   try {
-    const quiz = new Quiz(req.body);
+    // Ensure each question has a correct answer marked
+    const quizData = req.body;
+    
+    if (quizData.questions && quizData.questions.length > 0) {
+      for (const question of quizData.questions) {
+        if (!question.choices.some(choice => choice.isCorrectChoice)) {
+          return res.status(400).json({ 
+            message: 'Each question must have at least one correct answer marked'
+          });
+        }
+      }
+    }
+    
+    const quiz = new Quiz(quizData);
     const savedQuiz = await quiz.save();
     res.status(201).json(addIdField(savedQuiz));
   } catch (error) {
     console.error('Error creating quiz:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
@@ -86,9 +99,23 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
+    
+    // Ensure each question has a correct answer marked
+    const quizData = req.body;
+    
+    if (quizData.questions && quizData.questions.length > 0) {
+      for (const question of quizData.questions) {
+        if (!question.choices.some(choice => choice.isCorrectChoice)) {
+          return res.status(400).json({ 
+            message: 'Each question must have at least one correct answer marked'
+          });
+        }
+      }
+    }
+    
     const updatedQuiz = await Quiz.findByIdAndUpdate(
       id,
-      { ...req.body, updatedAt: Date.now() },
+      { ...quizData, updatedAt: Date.now() },
       { new: true, runValidators: true }
     );
     
@@ -99,7 +126,42 @@ router.put('/:id', async (req, res) => {
     res.json(addIdField(updatedQuiz));
   } catch (error) {
     console.error(`Error updating quiz ${req.params.id}:`, error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// PATCH a quiz (partial update)
+router.patch('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // If updating questions, ensure each has a correct answer
+    const patchData = req.body;
+    
+    if (patchData.questions && patchData.questions.length > 0) {
+      for (const question of patchData.questions) {
+        if (!question.choices.some(choice => choice.isCorrectChoice)) {
+          return res.status(400).json({ 
+            message: 'Each question must have at least one correct answer marked'
+          });
+        }
+      }
+    }
+    
+    const updatedQuiz = await Quiz.findByIdAndUpdate(
+      id,
+      { ...patchData, updatedAt: Date.now() },
+      { new: true, runValidators: true }
+    );
+    
+    if (!updatedQuiz) {
+      return res.status(404).json({ message: 'Quiz not found' });
+    }
+    
+    res.json(addIdField(updatedQuiz));
+  } catch (error) {
+    console.error(`Error patching quiz ${req.params.id}:`, error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
@@ -112,10 +174,10 @@ router.delete('/:id', async (req, res) => {
       return res.status(404).json({ message: 'Quiz not found' });
     }
     
-    res.json({ message: 'Quiz deleted successfully' });
+    res.json({ message: 'Quiz deleted successfully', id: req.params.id });
   } catch (error) {
     console.error(`Error deleting quiz ${req.params.id}:`, error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
