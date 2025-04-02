@@ -1,7 +1,7 @@
 
 import { Quiz, QuizGame } from "@/types/quiz";
 
-const API_BASE_URL = "http://localhost:5000/api"; // Change this to your actual API URL
+const API_BASE_URL = "http://localhost:5050/api"; // Change this to your actual API URL
 
 // Helper function to normalize quiz data (convert _id to id if needed)
 const normalizeQuiz = (quiz: any): Quiz => {
