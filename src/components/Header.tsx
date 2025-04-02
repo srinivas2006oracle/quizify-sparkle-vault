@@ -1,60 +1,43 @@
 
-import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { PlusCircle, Database, PlayCircle } from "lucide-react";
+import { useMobile } from "@/hooks/use-mobile";
 
 const Header = () => {
-  const location = useLocation();
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const navigate = useNavigate();
+  const isMobile = useMobile();
 
   return (
-    <header 
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-6 py-4 ${
-        scrolled 
-          ? "bg-white/80 backdrop-blur-md shadow-sm border-b border-border/50" 
-          : "bg-transparent"
-      }`}
-    >
-      <div className="container mx-auto flex items-center justify-between">
-        <Link 
-          to="/" 
-          className="text-2xl font-bold text-primary transition-colors hover:text-primary/80"
-        >
-          Quizify
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-border shadow-sm">
+      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+        <Link to="/" className="flex items-center gap-2">
+          <div className="bg-primary rounded-md p-1">
+            <Database className="h-5 w-5 text-white" />
+          </div>
+          <span className="text-xl font-bold">Quiz Builder</span>
         </Link>
-        
-        <nav className="hidden md:flex items-center space-x-8">
-          <NavLink to="/" label="Home" currentPath={location.pathname} />
-          <NavLink to="/create" label="Create Quiz" currentPath={location.pathname} />
-        </nav>
+
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() => navigate("/generate-game")}
+            className="gap-1"
+          >
+            <PlayCircle className="h-4 w-4" />
+            {!isMobile && "Generate Game"}
+          </Button>
+          
+          <Button
+            onClick={() => navigate("/create")}
+            className="gap-1"
+          >
+            <PlusCircle className="h-4 w-4" />
+            {!isMobile && "Create Quiz"}
+          </Button>
+        </div>
       </div>
     </header>
-  );
-};
-
-const NavLink = ({ to, label, currentPath }: { to: string; label: string; currentPath: string }) => {
-  const isActive = currentPath === to;
-  
-  return (
-    <Link
-      to={to}
-      className={`relative px-2 py-1 transition-colors ${
-        isActive ? "text-primary font-medium" : "text-foreground/80 hover:text-primary"
-      }`}
-    >
-      {label}
-      {isActive && (
-        <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary rounded-full animate-fade-in" />
-      )}
-    </Link>
   );
 };
 
