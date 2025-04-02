@@ -77,13 +77,28 @@ router.post('/', async (req, res) => {
     const quizData = req.body;
     
     if (quizData.questions && quizData.questions.length > 0) {
-      for (const question of quizData.questions) {
-        if (!question.choices.some(choice => choice.isCorrectChoice)) {
-          return res.status(400).json({ 
-            message: 'Each question must have at least one correct answer marked'
+      // Remove client-generated IDs to let MongoDB create proper ObjectIDs
+      quizData.questions.forEach(question => {
+        // Remove any client-side generated IDs that aren't valid ObjectIDs
+        if (question.id) delete question.id;
+        if (question._id && typeof question._id === 'string' && !question._id.match(/^[0-9a-fA-F]{24}$/)) {
+          delete question._id;
+        }
+        
+        // Also clean up choice IDs
+        if (question.choices) {
+          question.choices.forEach(choice => {
+            if (choice.id) delete choice.id;
+            if (choice._id && typeof choice._id === 'string' && !choice._id.match(/^[0-9a-fA-F]{24}$/)) {
+              delete choice._id;
+            }
           });
         }
-      }
+        
+        if (!question.choices.some(choice => choice.isCorrectChoice)) {
+          throw new Error('Each question must have at least one correct answer marked');
+        }
+      });
     }
     
     const quiz = new Quiz(quizData);
@@ -104,13 +119,28 @@ router.put('/:id', async (req, res) => {
     const quizData = req.body;
     
     if (quizData.questions && quizData.questions.length > 0) {
-      for (const question of quizData.questions) {
-        if (!question.choices.some(choice => choice.isCorrectChoice)) {
-          return res.status(400).json({ 
-            message: 'Each question must have at least one correct answer marked'
+      // Clean up client-generated IDs
+      quizData.questions.forEach(question => {
+        // Remove any client-side generated IDs that aren't valid ObjectIDs
+        if (question.id) delete question.id;
+        if (question._id && typeof question._id === 'string' && !question._id.match(/^[0-9a-fA-F]{24}$/)) {
+          delete question._id;
+        }
+        
+        // Also clean up choice IDs
+        if (question.choices) {
+          question.choices.forEach(choice => {
+            if (choice.id) delete choice.id;
+            if (choice._id && typeof choice._id === 'string' && !choice._id.match(/^[0-9a-fA-F]{24}$/)) {
+              delete choice._id;
+            }
           });
         }
-      }
+        
+        if (!question.choices.some(choice => choice.isCorrectChoice)) {
+          throw new Error('Each question must have at least one correct answer marked');
+        }
+      });
     }
     
     const updatedQuiz = await Quiz.findByIdAndUpdate(
@@ -139,13 +169,28 @@ router.patch('/:id', async (req, res) => {
     const patchData = req.body;
     
     if (patchData.questions && patchData.questions.length > 0) {
-      for (const question of patchData.questions) {
-        if (!question.choices.some(choice => choice.isCorrectChoice)) {
-          return res.status(400).json({ 
-            message: 'Each question must have at least one correct answer marked'
+      // Clean up client-generated IDs
+      patchData.questions.forEach(question => {
+        // Remove any client-side generated IDs that aren't valid ObjectIDs
+        if (question.id) delete question.id;
+        if (question._id && typeof question._id === 'string' && !question._id.match(/^[0-9a-fA-F]{24}$/)) {
+          delete question._id;
+        }
+        
+        // Also clean up choice IDs
+        if (question.choices) {
+          question.choices.forEach(choice => {
+            if (choice.id) delete choice.id;
+            if (choice._id && typeof choice._id === 'string' && !choice._id.match(/^[0-9a-fA-F]{24}$/)) {
+              delete choice._id;
+            }
           });
         }
-      }
+        
+        if (!question.choices.some(choice => choice.isCorrectChoice)) {
+          throw new Error('Each question must have at least one correct answer marked');
+        }
+      });
     }
     
     const updatedQuiz = await Quiz.findByIdAndUpdate(
