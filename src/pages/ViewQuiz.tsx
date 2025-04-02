@@ -140,7 +140,7 @@ const ViewQuiz = () => {
 
               <div className="flex flex-wrap gap-2">
                 {quiz.quizTopicsList.map((topic, index) => (
-                  <Badge key={index} variant="secondary">{topic}</Badge>
+                  <Badge key={`quiz-topic-${index}`} variant="secondary">{topic}</Badge>
                 ))}
               </div>
 
@@ -167,7 +167,7 @@ const ViewQuiz = () => {
                 <div className="space-y-6">
                   {quiz.questions.map((question, index) => (
                     <div 
-                      key={question.id} 
+                      key={question.id || `question-${index}`}
                       className="bg-white border border-border rounded-lg p-5 shadow-sm transition-shadow hover:shadow-md animate-in"
                       style={{ animationDelay: `${index * 100}ms` }}
                     >
@@ -198,7 +198,7 @@ const ViewQuiz = () => {
                           
                           return (
                             <div 
-                              key={choiceIndex} 
+                              key={`choice-${question.id || index}-${choiceIndex}`}
                               className={`flex items-center gap-3 p-3 rounded-md ${
                                 isCorrect
                                   ? "bg-green-50 border border-green-200"
@@ -230,8 +230,14 @@ const ViewQuiz = () => {
                       )}
 
                       <div className="flex flex-wrap gap-2 mt-4">
-                        {question.questionTopicsList.map((topic, i) => (
-                          <Badge key={i} variant="outline" className="text-xs">{topic}</Badge>
+                        {question.questionTopicsList.map((topic, topicIndex) => (
+                          <Badge 
+                            key={`question-topic-${question.id || index}-${topicIndex}`} 
+                            variant="outline" 
+                            className="text-xs"
+                          >
+                            {topic}
+                          </Badge>
                         ))}
                       </div>
                     </div>

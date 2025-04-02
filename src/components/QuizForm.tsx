@@ -450,7 +450,7 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialQuiz, onSave, isEditing }) =
               <Label htmlFor="topics">Topics</Label>
               <div className="flex flex-wrap gap-2 mb-2">
                 {quiz.quizTopicsList.map((topic, index) => (
-                  <Badge key={index} variant="secondary" className="gap-1 px-3 py-1.5">
+                  <Badge key={`quiz-topic-${index}`} variant="secondary" className="gap-1 px-3 py-1.5">
                     {topic}
                     <button
                       type="button"
@@ -511,7 +511,7 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialQuiz, onSave, isEditing }) =
                   <div className="space-y-1 max-h-[400px] overflow-y-auto pr-2">
                     {quiz.questions.map((question, index) => (
                       <div
-                        key={question.id}
+                        key={question.id || `question-${index}`}
                         className={`w-full text-left px-3 py-2 rounded-md transition-colors ${
                           activeQuestionIndex === index
                             ? "bg-primary/20 text-primary font-medium"
@@ -569,7 +569,7 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialQuiz, onSave, isEditing }) =
                       <Label>Answer Choices</Label>
                       <div className="space-y-3">
                         {quiz.questions[activeQuestionIndex].choices.map((choice, choiceIndex) => (
-                          <div key={choiceIndex} className="flex items-center gap-2">
+                          <div key={`choice-${activeQuestionIndex}-${choiceIndex}`} className="flex items-center gap-2">
                             <div 
                               className={`flex-shrink-0 w-5 h-5 rounded-full border flex items-center justify-center ${
                                 choice.isCorrectChoice
@@ -622,8 +622,12 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialQuiz, onSave, isEditing }) =
                     <div className="space-y-2">
                       <Label>Question Topics</Label>
                       <div className="flex flex-wrap gap-2 mb-2">
-                        {quiz.questions[activeQuestionIndex].questionTopicsList.map((topic, index) => (
-                          <Badge key={index} variant="secondary" className="gap-1 px-3 py-1.5">
+                        {quiz.questions[activeQuestionIndex].questionTopicsList.map((topic, topicIndex) => (
+                          <Badge 
+                            key={`question-topic-${activeQuestionIndex}-${topicIndex}`} 
+                            variant="secondary" 
+                            className="gap-1 px-3 py-1.5"
+                          >
                             {topic}
                             <button
                               type="button"
