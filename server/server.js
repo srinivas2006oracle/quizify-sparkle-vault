@@ -19,11 +19,11 @@ app.use(express.json({ limit: '10mb' })); // Increased limit for larger payloads
 
 // Connect to MongoDB
 // Use the alternative connection string if provided
-const MONGODB_URI = process.env.MONGODB_URI2 || process.env.MONGODB_URI;
+const MONGODB_URI = process.env.NODE_ENV === 'production' ? process.env.MONGODB_URI_PROD : process.env.MONGODB_URI_LOCAL;
+console.log(MONGODB_URI);
 mongoose.connect(MONGODB_URI)
   .then(() => console.log('MongoDB connected successfully'))
   .catch(err => console.error('MongoDB connection error:', err));
-
 // Routes
 app.use('/api/quizzes', quizRoutes);
 app.use('/api/quizgames', quizGameRoutes);
