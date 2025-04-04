@@ -2,6 +2,7 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
+/* this is in the youtube stream scheduler app
 const AllResponseSchema = new Schema({
   ytMessage: String, //snippet.displayMessage
   ytChannelId: String, //authorDetails.channelId
@@ -11,6 +12,7 @@ const AllResponseSchema = new Schema({
   fetchTimeStamp: { type: Date, default: Date.now }, //addedAt
   delayTime: String, //difference between systemTimeStamp
 });
+*/
 
 const ResponseSchema = new Schema({
   ytChannelId: String,
@@ -84,5 +86,4 @@ const Question = mongoose.model('Question', QuestionSchema);
 const Quiz = mongoose.model('Quiz', QuizSchema);
 const QuizGame = mongoose.model('QuizGame', QuizGameSchema);
 const Response = mongoose.model('Response', ResponseSchema);
-const AllResponse = mongoose.model('AllResponseSchema', AllResponseSchema);
-module.exports = { Choice, Question, Quiz, QuizGame, Response , AllResponse};
+module.exports = { Question, Quiz, QuizGame };
