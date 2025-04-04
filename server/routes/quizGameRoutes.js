@@ -177,7 +177,7 @@ router.post('/:id/start', async (req, res) => {
     
     quizGame.gameStartedAt = new Date();
     quizGame.isGameOpen = true;
-    quizGame.activeQuestionIndex = -1;
+    quizGame.activeQuestionIndex = 0;
     
     const updatedQuizGame = await quizGame.save();
     res.json(addIdField(updatedQuizGame));

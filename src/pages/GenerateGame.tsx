@@ -146,7 +146,7 @@ const GenerateGame = () => {
         gameScheduledEnd: endDate.toISOString(),
         gameStartedAt: '',
         gameEndedAt: '',
-        activeQuestionIndex: 0,
+        activeQuestionIndex: -1,
         questionStartedAt: '',
         isQuestionOpen: false,
         correctChoiceIndex: -1,

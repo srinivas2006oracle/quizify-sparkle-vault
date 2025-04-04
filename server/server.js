@@ -34,6 +34,7 @@ app.get('/', (req, res) => {
   res.send('Quiz API is running');
 });
 
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err);

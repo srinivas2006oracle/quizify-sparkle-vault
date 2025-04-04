@@ -70,7 +70,7 @@ const QuizGameSchema = new Schema({
   gameScheduledEnd: Date,
   gameStartedAt: Date,
   gameEndedAt: Date,
-  activeQuestionIndex: { type: Number, min: 0 },
+  activeQuestionIndex: { type: Number, min: -1 },
   questionStartedAt: Date,
   isQuestionOpen: Boolean,
   correctChoiceIndex: { type: Number, min: -1 },
