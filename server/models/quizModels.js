@@ -2,6 +2,16 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
+const AllResponseSchema = new Schema({
+  ytMessage: String, //snippet.displayMessage
+  ytChannelId: String, //authorDetails.channelId
+  ytProfilePicUrl: String, //authorDetails.profileImageUrl
+  ytUserName: String, //authorDetails.displayName
+  ytPubTimeStamp: { type: Date, default: Date.now }, //snippet.publishedAt
+  fetchTimeStamp: { type: Date, default: Date.now }, //addedAt
+  delayTime: String, //difference between systemTimeStamp
+});
+
 const ResponseSchema = new Schema({
   ytChannelId: String,
   ytProfilePicUrl: String,
@@ -74,5 +84,5 @@ const Question = mongoose.model('Question', QuestionSchema);
 const Quiz = mongoose.model('Quiz', QuizSchema);
 const QuizGame = mongoose.model('QuizGame', QuizGameSchema);
 const Response = mongoose.model('Response', ResponseSchema);
-
-module.exports = { Choice, Question, Quiz, QuizGame, Response };
+const AllResponse = mongoose.model('AllResponseSchema', AllResponseSchema);
+module.exports = { Choice, Question, Quiz, QuizGame, Response , AllResponse};
