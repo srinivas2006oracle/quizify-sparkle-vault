@@ -81,9 +81,7 @@ const QuizGameSchema = new Schema({
   questions: [QuestionSchema]
 });
 
-const Choice = mongoose.model('Choice', ChoiceSchema);
 const Question = mongoose.model('Question', QuestionSchema);
 const Quiz = mongoose.model('Quiz', QuizSchema);
 const QuizGame = mongoose.model('QuizGame', QuizGameSchema);
-const Response = mongoose.model('Response', ResponseSchema);
 module.exports = { Question, Quiz, QuizGame };

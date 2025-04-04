@@ -17,6 +17,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json({ limit: '10mb' })); // Increased limit for larger payloads
 
+
 // Connect to MongoDB
 // Use the alternative connection string if provided
 const MONGODB_URI = process.env.NODE_ENV === 'production' ? process.env.MONGODB_URI_PROD : process.env.MONGODB_URI_LOCAL;
