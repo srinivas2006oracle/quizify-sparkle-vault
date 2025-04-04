@@ -61,7 +61,7 @@ const QuizGameSchema = new Schema({
   activeQuestionIndex: { type: Number, min: 0 },
   questionStartedAt: Date,
   isQuestionOpen: Boolean,
-  correctChoiceIndex: { type: Number, min: -1 },
+  correctChoiceIndex: { type: Number, min: 0 },
   liveIDs: [String],
   liveChatdIDs: [String],
   isGameOpen: Boolean,
