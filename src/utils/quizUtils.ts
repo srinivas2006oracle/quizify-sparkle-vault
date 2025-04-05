@@ -1,4 +1,3 @@
-
 import { Quiz, Question, Choice, QuizGame } from "@/types/quiz";
 import { apiService } from "@/services/apiService";
 
@@ -88,11 +87,10 @@ export const createEmptyQuizGame = (): QuizGame => {
     activeQuestionIndex: 0,
     isQuestionOpen: false,
     correctChoiceIndex: -1,
-    liveIDs: [],
-    liveChatdIDs: [],
     isGameOpen: false,
     quizId: "",
-    questions: []
+    questions: [],
+    introImage: ""
   };
 };
 

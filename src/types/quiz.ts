@@ -66,9 +66,8 @@ export interface QuizGame {
   questionStartedAt?: string;
   isQuestionOpen: boolean;
   correctChoiceIndex: number;
-  liveIDs: string[];
-  liveChatdIDs: string[];
   isGameOpen: boolean;
   quizId: string;
   questions: Question[];
+  introImage?: string;
 }

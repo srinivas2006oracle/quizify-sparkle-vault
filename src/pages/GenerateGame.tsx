@@ -19,12 +19,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Switch } from "@/components/ui/switch";
 import Header from "@/components/Header";
 import DateTimePicker from "@/components/DateTimePicker";
 import { Quiz, QuizGame } from "@/types/quiz";
 import { loadQuizzes, createQuizGame, loadQuizGames, deleteQuizGame, formatDate } from "@/utils/quizUtils";
 import { useToast } from "@/hooks/use-toast";
-import { Search } from "lucide-react";
+import { Search, Image } from "lucide-react";
 
 const GenerateGame = () => {
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
@@ -36,6 +37,8 @@ const GenerateGame = () => {
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [enableIntroImage, setEnableIntroImage] = useState<boolean>(false);
+  const [introImageUrl, setIntroImageUrl] = useState<string>("");
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -150,11 +153,10 @@ const GenerateGame = () => {
         questionStartedAt: '',
         isQuestionOpen: false,
         correctChoiceIndex: -1,
-        liveIDs: [],
-        liveChatdIDs: [],
         isGameOpen: false,
         quizId: selectedQuizId,
         questions: selectedQuiz.questions,
+        introImage: enableIntroImage ? introImageUrl : undefined
       };
 
       const createdGame = await createQuizGame(newGame);
@@ -172,6 +174,8 @@ const GenerateGame = () => {
       setGameTitle("");
       setStartDate(undefined);
       setEndDate(undefined);
+      setEnableIntroImage(false);
+      setIntroImageUrl("");
     } catch (error) {
       console.error("Error creating quiz game:", error);
       toast({
@@ -275,6 +279,33 @@ const GenerateGame = () => {
                 </div>
               </div>
 
+              {/* Intro Image Section */}
+              <div className="space-y-4 pt-2 border-t border-border">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Image className="h-5 w-5 text-gray-500" />
+                    <Label htmlFor="enableIntroImage" className="font-medium">Enable Intro Image</Label>
+                  </div>
+                  <Switch
+                    id="enableIntroImage"
+                    checked={enableIntroImage}
+                    onCheckedChange={setEnableIntroImage}
+                  />
+                </div>
+                
+                {enableIntroImage && (
+                  <div className="space-y-2 pl-7">
+                    <Label htmlFor="introImageUrl">Image URL</Label>
+                    <Input
+                      id="introImageUrl"
+                      value={introImageUrl}
+                      onChange={(e) => setIntroImageUrl(e.target.value)}
+                      placeholder="Enter image URL"
+                    />
+                  </div>
+                )}
+              </div>
+
               <div className="flex justify-end gap-3 pt-4">
                 <Button 
                   type="button" 
@@ -327,6 +358,7 @@ const GenerateGame = () => {
                     <TableHead>Start Date</TableHead>
                     <TableHead>End Date</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead>Intro Image</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -348,6 +380,17 @@ const GenerateGame = () => {
                         ) : (
                           <span className="px-2 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-medium">
                             Scheduled
+                          </span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {game.introImage ? (
+                          <span className="px-2 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-medium">
+                            Yes
+                          </span>
+                        ) : (
+                          <span className="px-2 py-1 rounded-full bg-gray-100 text-gray-800 text-xs font-medium">
+                            No
                           </span>
                         )}
                       </TableCell>

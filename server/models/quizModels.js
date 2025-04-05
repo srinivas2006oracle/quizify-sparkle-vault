@@ -80,12 +80,13 @@ const QuizGameSchema = new Schema({
   //liveChatdIDs: [String],
   isGameOpen: Boolean,
   quizId: { type: Schema.Types.ObjectId, ref: 'Quiz' },
-  questions: [QuestionSchema]
+  questions: [QuestionSchema],
+  introImage: { type: String, default: '' }
 });
 
 const Question = mongoose.model('Question', QuestionSchema);
 const Quiz = mongoose.model('Quiz', QuizSchema);
 const QuizGame = mongoose.model('QuizGame', QuizGameSchema);
-const Answer = mongoose.model('QuizGame', AnswerSchema);
+const Answer = mongoose.model('Answer', AnswerSchema);
 
 module.exports = { Question, Quiz, QuizGame, Answer };
