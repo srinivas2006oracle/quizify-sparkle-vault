@@ -81,7 +81,8 @@ const QuizGameSchema = new Schema({
   isGameOpen: Boolean,
   quizId: { type: Schema.Types.ObjectId, ref: 'Quiz' },
   questions: [QuestionSchema],
-  introImage: { type: String, default: '' }
+  introImage: { type: String, default: '' },
+  gameMode: { type: String, enum: ['automatic', 'manual'], default: 'automatic' },
 });
 
 const Question = mongoose.model('Question', QuestionSchema);
