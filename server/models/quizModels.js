@@ -14,22 +14,24 @@ const AllResponseSchema = new Schema({
 });
 */
 
-const ResponseSchema = new Schema({
+const AnswerSchema = new Schema({
   ytChannelId: String,
   ytProfilePicUrl: String,
   userName: String,
   firstName: String,
   lastName: String,
-  ytTimeStamp: { type: Date, default: Date.now },
-  systemTimeStamp: { type: Date, default: Date.now },
-  responseTime: String,
+  //ytTimeStamp: { type: Date, default: Date.now },
+  //systemTimeStamp: { type: Date, default: Date.now },
+  responseTime: String, //questionStartedAt -ytPubTimeStamp
+  isCorrectAnswer: Boolean,
+  quizGameId: { type: Schema.Types.ObjectId, ref: 'QuizGame' },
 });
 
 const ChoiceSchema = new Schema({
   choiceIndex: Number,
   choiceText: String,
   choiceImageurl: String,
-  choiceResponses: [ResponseSchema],
+  //choiceResponses: [ResponseSchema],
   isCorrectChoice: Boolean
 });
 
@@ -74,8 +76,8 @@ const QuizGameSchema = new Schema({
   questionStartedAt: Date,
   isQuestionOpen: Boolean,
   correctChoiceIndex: { type: Number, min: -1 },
-  liveIDs: [String],
-  liveChatdIDs: [String],
+  //liveIDs: [String],
+  //liveChatdIDs: [String],
   isGameOpen: Boolean,
   quizId: { type: Schema.Types.ObjectId, ref: 'Quiz' },
   questions: [QuestionSchema]
@@ -84,4 +86,6 @@ const QuizGameSchema = new Schema({
 const Question = mongoose.model('Question', QuestionSchema);
 const Quiz = mongoose.model('Quiz', QuizSchema);
 const QuizGame = mongoose.model('QuizGame', QuizGameSchema);
-module.exports = { Question, Quiz, QuizGame };
+const Answer = mongoose.model('QuizGame', AnswerSchema);
+
+module.exports = { Question, Quiz, QuizGame, Answer };
